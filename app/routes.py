@@ -3,8 +3,8 @@ import uuid
 import tempfile
 import shutil
 from flask import Flask, request, jsonify
-from worker import run_job
-from models import db, ExtractionJob, ExtractionResult
+from .worker import run_job
+from .models import db, ExtractionJob, ExtractionResult
 from app import app, executor
 
 
@@ -54,7 +54,7 @@ def _run_extraction_job(temp_dir, job_id, archive_path, pattern, source_archive)
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-@app.route("/extraction/<job_id>", methods=["GET"])
+@app.route("/extractions/<job_id>", methods=["GET"])
 def get_extraction_status(job_id):
     job = ExtractionJob.query.get(job_id)
     if not job:
@@ -71,7 +71,7 @@ def get_extraction_status(job_id):
     })
 
 
-@app.route("/extraction/<job_id>/results", methods=["GET"])
+@app.route("/extractions/<job_id>/results", methods=["GET"])
 def get_extraction_results(job_id):
     job = ExtractionJob.query.get(job_id)
     if not job:
@@ -82,7 +82,7 @@ def get_extraction_results(job_id):
 
     pagination = ExtractionResult.query.filter_by(job_id=job_id)\
         .order_by(ExtractionResult.id)\
-        .paginate(page=page, limit=limit, error_out=False)
+        .paginate(page=page, per_page=limit, error_out=False)
 
     return jsonify({
         "job_id": job_id,
