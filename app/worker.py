@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 from .extraction import process_archive
-from app import app
 
-def _update_job_status(job_id, status, completed=False, **Kwargs):
+def _update_job_status(app, job_id, status, completed=False, **Kwargs):
     from .models import db, ExtractionJob
     with app.app_context():
         try:
@@ -27,12 +26,12 @@ def _update_job_status(job_id, status, completed=False, **Kwargs):
             raise
 
 
-def run_job(job_id, archive_path, pattern, source_archive):
-    _update_job_status(job_id, "running")
+def run_job(app, job_id, archive_path, pattern, source_archive):
+    _update_job_status(app, job_id, "running")
 
     try:
-        total = process_archive(archive_path, pattern, job_id, source_archive)
-        _update_job_status(job_id,"completed", True, match_count=total)
+        total = process_archive(app, archive_path, pattern, job_id, source_archive)
+        _update_job_status(app, job_id,"completed", True, match_count=total)
     
     except Exception:
-        _update_job_status(job_id, "failed", error="Extraction Failed")
+        _update_job_status(app, job_id, "failed", error="Extraction Failed")

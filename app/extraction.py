@@ -5,7 +5,6 @@ import tempfile
 import shutil
 import fnmatch
 from .config import MAX_DEPTH
-from app import app
 
 ARCHIVE_EXTENTIONS = ('.zip', '.tar', '.tar.gz', '.tgz', '.tar.bz2')
 
@@ -33,7 +32,7 @@ def extract_archive(archive_path, dest_folder):
     else:
         raise ValueError(f"Unsupported archive: {archive_path}")
 
-def process_archive(archive_path, pattern, job_id, source_archive, parent_path="", depth=0):
+def process_archive(app, archive_path, pattern, job_id, source_archive, parent_path="", depth=0):
     if depth > MAX_DEPTH:
         return 0
 
@@ -83,7 +82,7 @@ def process_archive(archive_path, pattern, job_id, source_archive, parent_path="
             matches += len(results_to_add)
 
             for nested_archive_path, nested_logical_path in archives_to_recurse:
-                matches += process_archive(
+                matches += process_archive(app, 
                     nested_archive_path, pattern, job_id,
                     source_archive, nested_logical_path, depth + 1
                 )

@@ -2,21 +2,22 @@ import os
 import uuid
 import tempfile
 import shutil
-from flask import Flask, request, jsonify
+from flask import Blueprint, current_app, request, jsonify
 from .worker import run_job
 from .models import db, ExtractionJob, ExtractionResult
-from app import app, executor
+from app import executor
 
+bp = Blueprint('main', __name__)
 
-@app.route("/health", methods=["GET"])
+@bp.route("/health", methods=["GET"])
 def health_check():
     return jsonify({"status": "ok"}), 200
 
 
-@app.route("/extractions", methods=["POST"])
+@bp.route("/extractions", methods=["POST"])
 def create_extraction():
     if "archive" not in request.files:
-        return jsonify({"error":"Missing 'archvive' file"}), 400
+        return jsonify({"error":"Missing 'archive' file"}), 400
     
     file = request.files["archive"]
     if file.filename == "":
@@ -42,19 +43,20 @@ def create_extraction():
         shutil.rmtree(temp_dir, ignore_errors=True)
         return jsonify({"error":"Extraction Job Failed, please retry"}), 500
 
-    executor.submit(_run_extraction_job, temp_dir, job_id, archive_path, pattern, file.filename)
+    app_instance = current_app._get_current_object()
+    executor.submit(_run_extraction_job, app_instance, temp_dir, job_id, archive_path, pattern, file.filename)
 
-    return jsonify({"JOB_ID":job_id}), 202
+    return jsonify({"job_id":job_id}), 202
 
-def _run_extraction_job(temp_dir, job_id, archive_path, pattern, source_archive):
+def _run_extraction_job(app_instance, temp_dir, job_id, archive_path, pattern, source_archive):
     try:
-        run_job(job_id, archive_path, pattern, source_archive)
+        run_job(app_instance, job_id, archive_path, pattern, source_archive)
     except Exception as e:
         print(f"Job with job ID: {job_id}, has failed, error: {str(e)}")
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-@app.route("/extractions/<job_id>", methods=["GET"])
+@bp.route("/extractions/<job_id>", methods=["GET"])
 def get_extraction_status(job_id):
     job = ExtractionJob.query.get(job_id)
     if not job:
@@ -71,7 +73,7 @@ def get_extraction_status(job_id):
     })
 
 
-@app.route("/extractions/<job_id>/results", methods=["GET"])
+@bp.route("/extractions/<job_id>/results", methods=["GET"])
 def get_extraction_results(job_id):
     job = ExtractionJob.query.get(job_id)
     if not job:
