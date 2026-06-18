@@ -8,6 +8,8 @@
 
 ## CURL API TEST
 
+**NOTE:** `input.zip` is added in repo which was used for testing the routes and app logic
+
 - curl -X POST http://localhost:8080/extractions -F "archive=@input.zip" -F "pattern=*.txt"
 
 - curl http://localhost:8080/extractions/<job_id>
@@ -201,10 +203,6 @@ GET /extractions/uuid-job-id/results?page=1&limit=10
   "error": "Job not found"
 }
 ```
-
-### NOTE: `input.zip` is added in repo which was used for testing the routes and app logic
-
-
 
 ## Design Choices and Assumptions
 
