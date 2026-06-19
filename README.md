@@ -1,35 +1,45 @@
 # ARCHIVE EXTRACTOR
 
 ## Docker command to build and run app:
-- docker-compose up --build -d
+
+```bash
+docker-compose up --build -d
+```
 
 ## Docker command to stop and remove container:
-- docker-compose down
+
+```bash
+docker-compose down
+```
 
 ## CURL API TEST
 
 **NOTE:** `input.zip` is added in repo which was used for testing the routes and app logic
 
-- curl -X POST http://localhost:8080/extractions -F "archive=@input.zip" -F "pattern=*.txt"
+```bash
+curl -X POST http://localhost:8080/extractions -F "archive=@input.zip" -F "pattern=*.txt"
 
-- curl http://localhost:8080/extractions/<job_id>
+curl http://localhost:8080/extractions/<job_id>
 
-- curl http://localhost:8080/extractions/<job_id>/results
+curl http://localhost:8080/extractions/<job_id>/results
 
-- curl "http://localhost:8080/extractions/<job_id>/results?page=2"
+curl "http://localhost:8080/extractions/<job_id>/results?page=2"
 
-- curl "http://localhost:8080/extractions/<job_id>/results?limit=2"
+curl "http://localhost:8080/extractions/<job_id>/results?limit=2"
 
-- curl "http://localhost:8080/extractions/<job_id>/results?page=2&limit=2"
+curl "http://localhost:8080/extractions/<job_id>/results?page=2&limit=2"
 
-- http://localhost:8080/extractions/<id>/results?page=2&limit=5
+curl http://localhost:8080/extractions/<id>/results?page=2&limit=5
 
-- curl http://localhost:8080/health
+curl http://localhost:8080/health
+```
 
 
 ## Command to run UT:
 
-- python -m pytest -v
+```bash
+python -m pytest -v
+```
 
 ## API Documentation
 
