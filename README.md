@@ -27,16 +27,17 @@
 - curl http://localhost:8080/health
 
 
-# Command to run UT:
+## Command to run UT:
+
 - python -m pytest -v
 
-# API Documentation
+## API Documentation
 
-## `GET /health`
+### `GET /health`
 
 Health check endpoint.
 
-### Response `200 OK`
+#### Response `200 OK`
 
 ```json
 {
@@ -46,11 +47,11 @@ Health check endpoint.
 
 ---
 
-## `POST /extractions`
+### `POST /extractions`
 
 Creates a new extraction job.
 
-### Request
+#### Request
 
 Content-Type:
 
@@ -65,7 +66,7 @@ Form fields:
 | archive | file | Yes | Archive file to extract |
 | pattern | string | Yes | Pattern to match files |
 
-### Example Request
+#### Example Request
 
 ```http
 POST /extractions
@@ -77,7 +78,7 @@ archive: file.zip
 pattern: *.txt
 ```
 
-### Response `202 Accepted`
+#### Response `202 Accepted`
 
 ```json
 {
@@ -85,9 +86,9 @@ pattern: *.txt
 }
 ```
 
-### Error Responses
+#### Error Responses
 
-#### `400 Bad Request`
+##### `400 Bad Request`
 
 ```json
 {
@@ -107,7 +108,7 @@ pattern: *.txt
 }
 ```
 
-#### `500 Internal Server Error`
+##### `500 Internal Server Error`
 
 ```json
 {
@@ -117,17 +118,17 @@ pattern: *.txt
 
 ---
 
-## `GET /extractions/{job_id}`
+### `GET /extractions/{job_id}`
 
 Gets extraction job status.
 
-### Path Parameters
+#### Path Parameters
 
 | Name | Type | Required | Description |
 |---|---|---|---|
 | job_id | string | Yes | Extraction job ID |
 
-### Response `200 OK`
+#### Response `200 OK`
 
 ```json
 {
@@ -141,7 +142,7 @@ Gets extraction job status.
 }
 ```
 
-### Error Response `404 Not Found`
+#### Error Response `404 Not Found`
 
 ```json
 {
@@ -151,30 +152,30 @@ Gets extraction job status.
 
 ---
 
-## `GET /extractions/{job_id}/results`
+### `GET /extractions/{job_id}/results`
 
 Gets paginated extraction results.
 
-### Path Parameters
+#### Path Parameters
 
 | Name | Type | Required | Description |
 |---|---|---|---|
 | job_id | string | Yes | Extraction job ID |
 
-### Query Parameters
+#### Query Parameters
 
 | Name | Type | Required | Default | Description |
 |---|---|---|---|---|
 | page | integer | No | 1 | Page number |
 | limit | integer | No | 10 | Results per page |
 
-### Example
+#### Example
 
 ```http
 GET /extractions/uuid-job-id/results?page=1&limit=10
 ```
 
-### Response `200 OK`
+#### Response `200 OK`
 
 ```json
 {
@@ -196,7 +197,7 @@ GET /extractions/uuid-job-id/results?page=1&limit=10
 }
 ```
 
-### Error Response `404 Not Found`
+#### Error Response `404 Not Found`
 
 ```json
 {
@@ -217,3 +218,11 @@ This choice was made because it keeps the implementation simple, avoids addition
 The application uses `ThreadPoolExecutor` to run extraction jobs asynchronously in the background.
 
 This decision is based on the assumption that most operations in this service are I/O-bound, including archive extraction, reading file metadata, matching file names against patterns, and writing matching results to the database. For this type of workload, using threads is a practical and efficient choice.
+
+## Assumptions
+
+- Data models remain unchanged, eliminating the need for database migrations.
+
+## Future Roadmaps
+
+- Transition to Gunicorn as the WSGI server.
